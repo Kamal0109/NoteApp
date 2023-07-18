@@ -7,23 +7,25 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class MainActivity<T> : AppCompatActivity(), NotesRVAdapter.INotesRVAdapter{
+class MainActivity<T : Any> : AppCompatActivity(), NotesRVAdapter.INotesRVAdapter{
 
     lateinit var viewModel: NoteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
         setContentView(R.layout.activity_main)
 
-
+        val recyclerView= findViewById<RecyclerView>(R.id.recyclerView)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         val adapter = NotesRVAdapter(this,this)
+        recyclerView.adapter = adapter
 
         viewModel = ViewModelProvider(this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(application)).get(NoteViewModel::class.java)
-            viewModel.allNotes.observe(this,Observer{
+            viewModel.allNotes.observe(this,Observer{list->list?.let {
+                adapter.updateList(it as ArrayList<Note>)
+            }
 
             })
     }
